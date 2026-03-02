@@ -251,11 +251,12 @@
                     const downloadLinks = document.getElementById('downloadLinks');
                     downloadLinks.innerHTML = '';
                     
-                    data.files.forEach(file => {
+                    Object.keys(data.files).forEach(filename => {
+                        const base64Content = data.files[filename];
                         const link = document.createElement('a');
-                        link.href = '/download/' + file;
-                        link.textContent = '📥 下载 ' + file;
-                        link.download = file;
+                        link.href = 'data:text/html;base64,' + base64Content;
+                        link.textContent = '📥 下载 ' + filename;
+                        link.download = filename;
                         downloadLinks.appendChild(link);
                     });
                     
