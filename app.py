@@ -29,7 +29,17 @@ def read_xiaoshutong(file_storage):
 def read_mingdan(file_storage):
     try:
         file_storage.seek(0)
-        df = pd.read_csv(file_storage, sep='\t', header=None, names=['奖项', '姓名'])
+        content = file_storage.read().decode('utf-8')
+        
+        if '\t' in content.split('\n')[0]:
+            sep = '\t'
+        elif ',' in content.split('\n')[0]:
+            sep = ','
+        else:
+            sep = None
+        
+        file_storage.seek(0)
+        df = pd.read_csv(file_storage, sep=sep, header=None, names=['奖项', '姓名'], engine='python')
         
         wanchengjiang = []
         youxiujiang = []
