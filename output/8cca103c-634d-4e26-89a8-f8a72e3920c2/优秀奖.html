@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>世界海洋日颁奖榜单</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/8a6e17e8c5.js" crossorigin="anonymous"></script>
+    <style>
+        :root {
+            --expert-color: #ffd700;
+            --creative-color: #a0d8ef;
+            --excellent-color: #98fb98;
+            --text-dark: #333;
+            --text-light: #fff;
+            --shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf9 100%);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            animation: fadeIn 1s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        header {
+            text-align: center;
+            margin: 30px 0;
+            position: relative;
+        }
+        
+        h1 {
+            font-family: 'Comic Neue', cursive;
+            font-size: 2.8rem;
+            color: #4a6fc2;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .subtitle {
+            font-size: 1.4rem;
+            color: #6c757d;
+            max-width: 600px;
+            margin: 0 auto 30px;
+            line-height: 1.5;
+        }
+        
+        .watermelon-badge {
+            display: inline-block;
+            font-size: 1.2rem;
+            background-color: #fff;
+            padding: 5px 15px;
+            border-radius: 30px;
+            margin: 0 3px;
+            box-shadow: var(--shadow);
+        }
+        
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .search-box {
+            flex-grow: 1;
+            min-width: 250px;
+            position: relative;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border: 1px solid #ddd;
+            border-radius: 50px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .search-box input:focus {
+            border-color: #4a6fc2;
+            box-shadow: 0 0 0 3px rgba(74, 111, 194, 0.2);
+            outline: none;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+        
+        .info-text {
+            font-size: 1.1rem;
+            text-align: right;
+            padding-right: 10px;
+        }
+        
+        .awards-section {
+            margin-bottom: 40px;
+        }
+        
+        .award-category {
+            margin-bottom: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+        
+        .award-category:hover {
+            transform: translateY(-5px);
+        }
+        
+        .award-header {
+            padding: 20px;
+            color: var(--text-light);
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .expert .award-header {
+            background: linear-gradient(to right, #d4af37, var(--expert-color));
+        }
+        
+        .creative .award-header {
+            background: linear-gradient(to right, #4b9cd3, var(--creative-color));
+        }
+        
+        .excellent .award-header {
+            background: linear-gradient(to right, #32cd32, var(--excellent-color));
+        }
+        
+        .winners-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            padding: 25px;
+            background-color: rgba(255, 255, 255, 0.9);
+            min-height: 150px;
+        }
+        
+        .winner-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid #eee;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .winner-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+        
+        .winner-card.expert::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background-color: var(--expert-color);
+        }
+        
+        .winner-card.creative::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background-color: var(--creative-color);
+        }
+        
+        .winner-card.excellent::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background-color: var(--excellent-color);
+        }
+        
+        .winner-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+        }
+        
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+            color: #6c757d;
+        }
+        
+        .watermelon-coin {
+            font-size: 1.1rem;
+            background-color: #f8f8f8;
+            padding: 3px 10px;
+            border-radius: 30px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        
+        .watermelon-coin i {
+            margin-right: 5px;
+            color: #e74c3c;
+        }
+        
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 40px;
+            box-shadow: var(--shadow);
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            color: #6c757d;
+        }
+        
+        .winner-count {
+            color: #4a6fc2;
+        }
+        
+        .expert-count {
+            color: #d4af37;
+        }
+        
+        .creative-count {
+            color: #4b9cd3;
+        }
+        
+        .excellent-count {
+            color: #32cd32;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .logo {
+            font-family: 'Comic Neue', cursive;
+            color: #4a6fc2;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+        
+        .congrats-icon {
+            display: inline-block;
+            animation: bounce 2s infinite;
+            margin: 0 10px;
+            color: #4a6fc2;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .info-text {
+                text-align: center;
+            }
+            
+            .winners-list {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>世界海洋日颁奖榜单</h1>
+            <p class="subtitle">各位小西瓜在本项目中展现出了超强的创造力与智慧！以下是获奖名单及对应的西瓜币奖励</p>
+            <div class="watermelon-badge">
+                <i class="fas fa-watermelon"></i>
+                奖项奖励：
+                <span class="watermelon-coin">优秀奖 <strong>200🍉</strong></span>
+            </div>
+        </header>
+        
+        <section class="controls">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="搜索获奖者姓名...">
+            </div>
+            <div class="info-text">
+                共 <span id="totalWinners">12</span> 名获奖者
+            </div>
+        </section>
+        
+        <section class="awards-section">
+            
+            <div class="award-category excellent">
+                <div class="award-header">
+                    <div>优秀奖</div>
+                    <div class="coins">200 <i class="fas fa-watermelon"></i> /人</div>
+                </div>
+                <div class="winners-list" id="excellentWinners">
+                    <!-- 优秀奖获奖者将在这里展示 -->
+                </div>
+            </div>
+        </section>
+        
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value winner-count" id="totalCount">0</div>
+                <div class="stat-label">总获奖人数</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value creative-count" id="creativeCount">0</div>
+                <div class="stat-label">创意奖人数</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value excellent-count" id="excellentCount">0</div>
+                <div class="stat-label">优秀奖人数</div>
+            </div>
+        </div>
+        
+        <footer>
+            <div class="logo">领航实践营 <i class="fas fa-child"></i></div>
+            <p>祝贺所有获奖者！<i class="congrats-icon fas fa-star"></i> 期待你们在之后的项目中创作更有趣的作品！</p>
+            <p>© 2025 西瓜创客</p>
+        </footer>
+    </div>
+
+    <script>
+        // 奖项数据
+        const awardsData = [{"award": "优秀奖", "name": "Felix"},
+{"award": "优秀奖", "name": "小韩"},
+{"award": "优秀奖", "name": "张子月"},
+{"award": "优秀奖", "name": "徐玉良"},
+{"award": "优秀奖", "name": "李嘉雯"},
+{"award": "优秀奖", "name": "李文博"},
+{"award": "优秀奖", "name": "桃桃"},
+{"award": "优秀奖", "name": "王雨彤"},
+{"award": "优秀奖", "name": "秦明辉"},
+{"award": "优秀奖", "name": "蒋钧泽"},
+{"award": "优秀奖", "name": "郭昊霖"},
+{"award": "优秀奖", "name": "陈梓轩"}];
+        
+        // 西瓜币对应关系
+        const watermelonCoins = {
+            "专家奖": 1000,
+            "创意奖": 400,
+            "优秀奖": 200
+        };
+        
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            renderAwards(awardsData);
+            
+            // 设置搜索功能
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase().trim();
+                
+                if (searchTerm === '') {
+                    renderAwards(awardsData);
+                    return;
+                }
+                
+                const filteredData = awardsData.filter(person => {
+                    return person.name.toLowerCase().includes(searchTerm);
+                });
+                
+                renderAwards(filteredData);
+            });
+        });
+        
+        // 渲染奖项函数
+        function renderAwards(data) {
+            // 清空当前列表
+            document.getElementById('excellentWinners').innerHTML = '';
+            
+            // 按奖项分类
+            const excellents = data.filter(item => item.award === '优秀奖');
+            
+            // 统计数据
+            document.getElementById('totalCount').textContent = data.length;
+            document.getElementById('excellentCount').textContent = excellents.length;
+            
+            // 渲染专家奖
+            // 渲染创意奖
+            
+            // 渲染优秀奖
+            renderCategory(excellents, 'excellentWinners', '优秀奖');
+            
+            // 如果没有结果
+            if (data.length === 0) {
+                const noResults = document.createElement('div');
+                noResults.className = 'no-results';
+                noResults.textContent = '没有找到匹配的获奖者';
+                document.getElementById('excellentWinners').appendChild(noResults);
+            }
+        }
+        
+        // 渲染一个奖项类别的函数
+        function renderCategory(people, elementId, awardType) {
+            const container = document.getElementById(elementId);
+            
+            if (people.length === 0) {
+                return;
+            }
+            
+            people.forEach(person => {
+                const winnerCard = document.createElement('div');
+                winnerCard.className = `winner-card ${getAwardClass(awardType)}`;
+                
+                const nameElement = document.createElement('div');
+                nameElement.className = 'winner-name';
+                nameElement.textContent = person.name;
+                
+                const awardElement = document.createElement('div');
+                awardElement.textContent = person.award;
+                awardElement.style.fontSize = '0.9rem';
+                awardElement.style.color = '#777';
+                awardElement.style.marginBottom = '8px';
+                
+                const coinElement = document.createElement('div');
+                coinElement.className = 'watermelon-coin';
+                coinElement.innerHTML = `<i class="fas fa-watermelon"></i> ${watermelonCoins[awardType]}🍉`;
+                
+                winnerCard.appendChild(nameElement);
+                winnerCard.appendChild(awardElement);
+                winnerCard.appendChild(coinElement);
+                
+                container.appendChild(winnerCard);
+            });
+        }
+        
+        // 获取奖项对应的CSS类名
+        function getAwardClass(awardType) {
+            switch(awardType) {
+                case '专家奖': return 'expert';
+                case '创意奖': return 'creative';
+                case '优秀奖': return 'excellent';
+                default: return '';
+            }
+        }
+    </script>
+</body>
+</html>
