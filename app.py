@@ -1,8 +1,10 @@
 import pandas as pd
 import re
 import os
-from flask import Flask, render_template, request, jsonify, send_from_directory
-import uuid
+import base64
+from flask import Flask, render_template, request, jsonify, send_file
+import io
+import tempfile
 
 app = Flask(__name__)
 
@@ -10,10 +12,12 @@ INTERNAL_EMPLOYEES = [
     "凹凸", "凹凸曼", "Count", '​Chloe', 'Isabella', '测试 账号', '--', 'James', 'Zoe'
 ]
 
-OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
+def get_template_dir():
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 
 def read_xiaoshutong(file_storage):
     try:
+        file_storage.seek(0)
         df = pd.read_excel(file_storage)
         names = df['学员名称'].dropna().astype(str).str.strip().tolist()
         names = [name for name in names if name and not name.isdigit() and name not in INTERNAL_EMPLOYEES]
@@ -24,6 +28,7 @@ def read_xiaoshutong(file_storage):
 
 def read_mingdan(file_storage):
     try:
+        file_storage.seek(0)
         df = pd.read_csv(file_storage, sep='\t', header=None, names=['奖项', '姓名'])
         
         wanchengjiang = []
@@ -168,74 +173,60 @@ def index():
 
 @app.route('/generate', methods=['POST'])
 def generate():
-    mingdan_file = request.files.get('mingdan')
-    xiaoshutong_file = request.files.get('xiaoshutong')
-    
-    if not mingdan_file:
-        return jsonify({'error': '请上传名单.csv文件'}), 400
-    
-    wanchengjiang, youxiujiang, chuangyijiang = read_mingdan(mingdan_file)
-    
-    xiaoshutong_names = []
-    if xiaoshutong_file:
-        xiaoshutong_names = read_xiaoshutong(xiaoshutong_file)
-    
-    wanchengjiang_list = list(set(xiaoshutong_names + wanchengjiang))
-    wanchengjiang_list.sort()
-    youxiujiang.sort()
-    chuangyijiang.sort()
-    
-    session_id = str(uuid.uuid4())
-    session_dir = os.path.join(OUTPUT_DIR, session_id)
-    os.makedirs(session_dir, exist_ok=True)
-    
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    template_dir = os.path.join(base_dir, 'templates')
-    
-    wancheng_template = os.path.join(template_dir, '完成奖.html')
-    youxiujiang_template = os.path.join(template_dir, '优秀奖-创意奖.html')
-    youxiujiang_only_template = os.path.join(template_dir, '优秀奖.html')
-    
-    files = {}
-    
-    with open(wancheng_template, 'r', encoding='utf-8') as f:
-        wancheng_content = update_wanchengjiang_html(wanchengjiang_list, f.read())
-    
-    wancheng_path = os.path.join(session_dir, '完成奖.html')
-    with open(wancheng_path, 'w', encoding='utf-8') as f:
-        f.write(wancheng_content)
-    files['完成奖.html'] = '/output/' + session_id + '/完成奖.html'
-    
-    if chuangyijiang:
-        with open(youxiujiang_template, 'r', encoding='utf-8') as f:
-            youxiujiang_content = update_youxiujiang_html(youxiujiang, chuangyijiang, f.read())
+    try:
+        mingdan_file = request.files.get('mingdan')
+        xiaoshutong_file = request.files.get('xiaoshutong')
         
-        youxiujiang_path = os.path.join(session_dir, '优秀奖-创意奖.html')
-        with open(youxiujiang_path, 'w', encoding='utf-8') as f:
-            f.write(youxiujiang_content)
-        files['优秀奖-创意奖.html'] = '/output/' + session_id + '/优秀奖-创意奖.html'
-    else:
-        with open(youxiujiang_only_template, 'r', encoding='utf-8') as f:
-            youxiujiang_content = update_youxiujiang_only_html(youxiujiang, f.read())
+        if not mingdan_file:
+            return jsonify({'error': '请上传名单.csv文件'}), 400
         
-        youxiujiang_path = os.path.join(session_dir, '优秀奖.html')
-        with open(youxiujiang_path, 'w', encoding='utf-8') as f:
-            f.write(youxiujiang_content)
-        files['优秀奖.html'] = '/output/' + session_id + '/优秀奖.html'
-    
-    return jsonify({
-        'success': True,
-        'session_id': session_id,
-        'wanchengjiang': len(wanchengjiang_list),
-        'youxiujiang': len(youxiujiang),
-        'chuangyijiang': len(chuangyijiang),
-        'files': files
-    })
-
-@app.route('/output/<path:filename>')
-def serve_output(filename):
-    return send_from_directory('output', filename)
+        wanchengjiang, youxiujiang, chuangyijiang = read_mingdan(mingdan_file)
+        
+        xiaoshutong_names = []
+        if xiaoshutong_file:
+            xiaoshutong_names = read_xiaoshutong(xiaoshutong_file)
+        
+        wanchengjiang_list = list(set(xiaoshutong_names + wanchengjiang))
+        wanchengjiang_list.sort()
+        youxiujiang.sort()
+        chuangyijiang.sort()
+        
+        template_dir = get_template_dir()
+        
+        wancheng_template = os.path.join(template_dir, '完成奖.html')
+        youxiujiang_template = os.path.join(template_dir, '优秀奖-创意奖.html')
+        youxiujiang_only_template = os.path.join(template_dir, '优秀奖.html')
+        
+        files = {}
+        
+        with open(wancheng_template, 'r', encoding='utf-8') as f:
+            wancheng_content = update_wanchengjiang_html(wanchengjiang_list, f.read())
+        
+        wancheng_base64 = base64.b64encode(wancheng_content.encode('utf-8')).decode('utf-8')
+        files['完成奖.html'] = wancheng_base64
+        
+        if chuangyijiang:
+            with open(youxiujiang_template, 'r', encoding='utf-8') as f:
+                youxiujiang_content = update_youxiujiang_html(youxiujiang, chuangyijiang, f.read())
+            
+            youxiujiang_base64 = base64.b64encode(youxiujiang_content.encode('utf-8')).decode('utf-8')
+            files['优秀奖-创意奖.html'] = youxiujiang_base64
+        else:
+            with open(youxiujiang_only_template, 'r', encoding='utf-8') as f:
+                youxiujiang_content = update_youxiujiang_only_html(youxiujiang, f.read())
+            
+            youxiujiang_base64 = base64.b64encode(youxiujiang_content.encode('utf-8')).decode('utf-8')
+            files['优秀奖.html'] = youxiujiang_base64
+        
+        return jsonify({
+            'success': True,
+            'wanchengjiang': len(wanchengjiang_list),
+            'youxiujiang': len(youxiujiang),
+            'chuangyijiang': len(chuangyijiang),
+            'files': files
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
     app.run(debug=True, host='0.0.0.0', port=5000)
