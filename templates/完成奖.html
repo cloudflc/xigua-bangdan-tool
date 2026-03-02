@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>积极创作表扬榜</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #fff9e6 0%, #fff1cc 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin: 20px 0;
+            position: relative;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(90deg, #ffd700 0%, #ffb700 100%);
+            color: #8b4513;
+            position: relative;
+            margin: -20px -20px 30px -20px;
+            border-bottom: 5px solid #d4af37;
+        }
+        
+        .header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            letter-spacing: 2px;
+        }
+        
+        .header p {
+            font-size: 1.4rem;
+            max-width: 600px;
+            margin: 0 auto;
+            font-weight: 500;
+        }
+        
+        .reward-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #ff4d4d;
+            color: white;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            animation: pulse 2s infinite;
+        }
+        
+        .reward-badge .amount {
+            font-size: 1.8rem;
+            line-height: 1;
+        }
+        
+        .reward-badge .text {
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        .students-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            padding: 10px;
+        }
+        
+        .student-card {
+            background: linear-gradient(to bottom, #ffffff 0%, #fff9e6 100%);
+            border-radius: 10px;
+            padding: 20px 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border: 2px solid #ffd700;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .student-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 183, 0, 0.3);
+            border-color: #ffb700;
+        }
+        
+        .student-card::before {
+            content: "";
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: 20px;
+            height: 20px;
+            background: #ffd700;
+            border-radius: 50%;
+        }
+        
+        .student-card::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            right: -10px;
+            width: 20px;
+            height: 20px;
+            background: #ffd700;
+            border-radius: 50%;
+        }
+        
+        .student-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .reward-info {
+            background: #fffbeb;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 500;
+            color: #d4af37;
+            border: 1px dashed #ffd700;
+        }
+        
+        .watermelon-icon {
+            color: #ff4d4d;
+            font-size: 1.8rem;
+            margin: 0 5px;
+            vertical-align: middle;
+        }
+        
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            background: #fff9e6;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 30px 0;
+            font-weight: 600;
+            color: #8b4513;
+            border: 2px solid #ffd700;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            color: #ff6b00;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 1rem;
+        }
+        
+        .print-btn {
+            background: linear-gradient(90deg, #ffd700 0%, #ffb700 100%);
+            color: #8b4513;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .print-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 183, 0, 0.4);
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @media (max-width: 768px) {
+            .students-container {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            }
+            
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .stat-number {
+                font-size: 1.6rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .students-container {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .reward-badge {
+                width: 80px;
+                height: 80px;
+                top: 10px;
+                right: 10px;
+            }
+            
+            .reward-badge .amount {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>积极创作表扬榜</h1>
+            <p>热烈祝贺以下学员获得100西瓜币奖励</p>
+            <div class="reward-badge">
+                <div class="amount">100</div>
+                <div class="text">西瓜币</div>
+            </div>
+        </div>
+        
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-number">100</div>
+                <div>获奖学员</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">10000</div>
+                <div>总奖励西瓜币</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">2026</div>
+                <div>表彰年份</div>
+            </div>
+        </div>
+        
+        <div class="students-container" id="studentsContainer">
+            <!-- 学员卡片将通过JavaScript动态生成 -->
+        </div>
+        
+        <div style="text-align: center;">
+            <button class="print-btn" onclick="window.print()">
+                <i class="fas fa-print"></i> 打印表扬榜
+            </button>
+        </div>
+        
+        <div class="footer">
+            <p>恭喜所有获奖学员！愿你们继续努力，再创佳绩！</p>
+        </div>
+    </div>
+
+    <script>
+        // 学员名单数据
+        const students = ['Felix', 'Rick', '傅诗洋', '冯思锜', '刘千禾', '刘宗翰', '刘晋铭', '刘海硕', '刘熙恬', '刘金柏', '史朝中', '司雨泽', '吴婉毓', '吴宇哲', '吴恩霖', '周炜峰', '周禹成', '唐歆翔', '姚闰凯', '姜可心', '孙晟博', '孙铭浦', '孟书贤', '宋兆恩', '宋博', '宋家来', '宋沐轩', '宋筱溪', '宫庆宸', '小韩', '尹梓宸', '崔梓元', '张传轩', '张俊喆', '张子月', '张宸瑞', '徐健豪', '徐玉良', '徐雨嫣', '成冠宏', '曹轩', '曹鹏轩', '曾晨鑫', '李一诺', '李嘉雯', '李尧天', '李文博', '李梓汐', '李梓瑜', '李泽霖', '李芊予', '李青璇', '李飞扬', '桃桃', '汪皙喆', '游子锋', '王博涵', '王培智', '王延睿', '王梓霖', '王楷轩', '王浩森', '王燕毅', '王艺轩', '王誉胜', '王近蕴', '王雨彤', '王雨桐', '田宜初', '石舒悦', '秦明辉', '缪沁芸', '艾玉鋮', '蒋钧泽', '谭佳怡', '赵博扬', '赵宜州', '赵家硕', '赵紫含', '辛浩然', '邓皓文', '郑杰', '郑骋', '郭昊霖', '陈昕阳', '陈梓轩', '陈沫蓉', '陈照心', '陈睿周', '雷乔麟', '韩明澈', '韩煜波', '颜子媛', '高煜鑫', '高裕航', '魏子宸', '黄文茁', '黄潘柳生', '黄福鑫', '龚杰睿'];
+        
+        // 在DOM加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取容器元素
+            const container = document.getElementById('studentsContainer');
+            
+            // 生成学员卡片
+            students.forEach(student => {
+                const card = document.createElement('div');
+                card.className = 'student-card';
+                card.innerHTML = `
+                    <div class="student-name">${student}</div>
+                    <div class="reward-info">
+                        <i class="fas fa-award"></i> 奖励 
+                        <span class="watermelon-icon">🍉</span> 100
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        });
+    </script>
+</body>
+</html>

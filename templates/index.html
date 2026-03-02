@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>榜单制作工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            background: #fafafa;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        input[type="file"]:hover {
+            border-color: #667eea;
+            background: #f5f5ff;
+        }
+        
+        .hint {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .progress {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 0;
+            transition: width 0.3s;
+        }
+        
+        .status {
+            margin-top: 12px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .result {
+            display: none;
+            margin-top: 24px;
+            padding: 20px;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+        }
+        
+        .result.success {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+        
+        .result h3 {
+            color: #16a34a;
+            margin-bottom: 12px;
+        }
+        
+        .result p {
+            color: #555;
+            margin-bottom: 8px;
+        }
+        
+        .download-links {
+            margin-top: 16px;
+        }
+        
+        .download-links a {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: background 0.3s;
+        }
+        
+        .download-links a:hover {
+            background: #764ba2;
+        }
+        
+        .error {
+            display: none;
+            margin-top: 20px;
+            padding: 16px;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            color: #dc2626;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏆 榜单制作工具</h1>
+        
+        <form id="uploadForm" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="mingdan">名单.csv 文件 *</label>
+                <input type="file" id="mingdan" name="mingdan" accept=".csv" required>
+                <div class="hint">必填，包含完成奖、优秀奖、创意奖名单</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="xiaoshutong">小书童文件 (可选)</label>
+                <input type="file" id="xiaoshutong" name="xiaoshutong" accept=".xlsx,.csv">
+                <div class="hint">可选，用于获取完成奖名单</div>
+            </div>
+            
+            <button type="submit" id="submitBtn">制作榜单</button>
+        </form>
+        
+        <div class="progress" id="progress">
+            <div class="progress-bar">
+                <div class="progress-bar-fill" id="progressBar"></div>
+            </div>
+            <div class="status" id="status">正在处理...</div>
+        </div>
+        
+        <div class="error" id="error"></div>
+        
+        <div class="result" id="result">
+            <h3>✅ 制作完成！</h3>
+            <p>完成奖人数: <span id="wanchengjiangCount">0</span></p>
+            <p>优秀奖人数: <span id="youxiujiangCount">0</span></p>
+            <p>创意奖人数: <span id="chuangyijiangCount">0</span></p>
+            <div class="download-links" id="downloadLinks"></div>
+        </div>
+    </div>
+    
+    <script>
+        const form = document.getElementById('uploadForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const progress = document.getElementById('progress');
+        const progressBar = document.getElementById('progressBar');
+        const status = document.getElementById('status');
+        const errorDiv = document.getElementById('error');
+        const resultDiv = document.getElementById('result');
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            
+            submitBtn.disabled = true;
+            progress.style.display = 'block';
+            resultDiv.style.display = 'none';
+            errorDiv.style.display = 'none';
+            progressBar.style.width = '30%';
+            status.textContent = '正在读取文件...';
+            
+            try {
+                progressBar.style.width = '50%';
+                status.textContent = '正在处理数据...';
+                
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                progressBar.style.width = '100%';
+                status.textContent = '完成！';
+                
+                if (data.success) {
+                    document.getElementById('wanchengjiangCount').textContent = data.wanchengjiang;
+                    document.getElementById('youxiujiangCount').textContent = data.youxiujiang;
+                    document.getElementById('chuangyijiangCount').textContent = data.chuangyijiang;
+                    
+                    const downloadLinks = document.getElementById('downloadLinks');
+                    downloadLinks.innerHTML = '';
+                    
+                    data.files.forEach(file => {
+                        const link = document.createElement('a');
+                        link.href = '/download/' + file;
+                        link.textContent = '📥 下载 ' + file;
+                        link.download = file;
+                        downloadLinks.appendChild(link);
+                    });
+                    
+                    resultDiv.style.display = 'block';
+                } else {
+                    errorDiv.textContent = data.error || '处理失败';
+                    errorDiv.style.display = 'block';
+                }
+            } catch (err) {
+                errorDiv.textContent = '网络错误: ' + err.message;
+                errorDiv.style.display = 'block';
+            } finally {
+                submitBtn.disabled = false;
+                setTimeout(() => {
+                    progress.style.display = 'none';
+                    progressBar.style.width = '0';
+                }, 2000);
+            }
+        });
+    </script>
+</body>
+</html>
