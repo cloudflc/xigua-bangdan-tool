@@ -1,0 +1,19 @@
+{
+  "version": "2.0",
+  "envId": "{{envId}}",
+  "framework": {
+    "name": "xigua-bangdan-tool",
+    "plugins": {
+      "node": {
+        "use": "@cloudbase/framework-plugin-node",
+        "inputs": {
+          "name": "xigua-bangdan-tool",
+          "path": "/",
+          "buildCommand": "pip install -r requirements.txt",
+          "startCommand": "python app.py",
+          "port": 5000
+        }
+      }
+    }
+  }
+}
